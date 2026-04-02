@@ -14,7 +14,7 @@ func TestGetSize_File(t *testing.T) {
 		t.Fatalf("Failed to stat test file: %v", err)
 	}
 
-	size, err := GetSize(testFile, false)
+	size, err := GetSize(testFile, false, false)
 	if err != nil {
 		t.Fatalf("GetSize() error = %v", err)
 	}
@@ -41,7 +41,7 @@ func TestGetSize_Directory(t *testing.T) {
 		t.Fatalf("Failed to create file2: %v", err)
 	}
 
-	size, err := GetSize(tmpDir, false)
+	size, err := GetSize(tmpDir, false, false)
 	if err != nil {
 		t.Fatalf("GetSize() error = %v", err)
 	}
@@ -74,19 +74,29 @@ func TestGetSize_DirectoryWithSubdir(t *testing.T) {
 		t.Fatalf("Failed to create file2: %v", err)
 	}
 
-	size, err := GetSize(tmpDir, false)
+	size, err := GetSize(tmpDir, false, false)
 	if err != nil {
 		t.Fatalf("GetSize() error = %v", err)
 	}
 
 	expected := int64(8)
 	if size != expected {
-		t.Errorf("GetSize() = %d, want %d (only first level files)", size, expected)
+		t.Errorf("GetSize() non-recursive = %d, want %d (only first level files)", size, expected)
+	}
+
+	sizeRecursive, err := GetSize(tmpDir, false, true)
+	if err != nil {
+		t.Fatalf("GetSize() recursive error = %v", err)
+	}
+
+	expectedRecursive := int64(8 + 8)
+	if sizeRecursive != expectedRecursive {
+		t.Errorf("GetSize() recursive = %d, want %d", sizeRecursive, expectedRecursive)
 	}
 }
 
 func TestGetSize_NotFound(t *testing.T) {
-	_, err := GetSize("/nonexistent/path", false)
+	_, err := GetSize("/nonexistent/path", false, false)
 	if err == nil {
 		t.Error("GetSize() expected error for nonexistent path, got nil")
 	}
@@ -108,12 +118,12 @@ func TestGetSize_WithHiddenFiles(t *testing.T) {
 		t.Fatalf("Failed to create hidden file: %v", err)
 	}
 
-	sizeWithoutHidden, err := GetSize(tmpDir, false)
+	sizeWithoutHidden, err := GetSize(tmpDir, false, false)
 	if err != nil {
 		t.Fatalf("GetSize() error = %v", err)
 	}
 
-	sizeWithHidden, err := GetSize(tmpDir, true)
+	sizeWithHidden, err := GetSize(tmpDir, true, false)
 	if err != nil {
 		t.Fatalf("GetSize() error = %v", err)
 	}
