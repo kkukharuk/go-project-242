@@ -5,9 +5,15 @@ run: build
 	./bin/hexlet-path-size
 
 test:
-	go test ./...
+	go test -v ./...
+
+lint:
+	golangci-lint run
+
+lint-fix:
+	golangci-lint run --fix
 
 clean:
 	rm -rf bin/*
 
-.PHONY: build run test clean
+.PHONY: build run test lint lint-fix clean
