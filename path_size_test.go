@@ -14,7 +14,7 @@ func TestGetSize_File(t *testing.T) {
 		t.Fatalf("Failed to stat test file: %v", err)
 	}
 
-	size, err := GetSize(testFile)
+	size, err := GetSize(testFile, false)
 	if err != nil {
 		t.Fatalf("GetSize() error = %v", err)
 	}
@@ -41,7 +41,7 @@ func TestGetSize_Directory(t *testing.T) {
 		t.Fatalf("Failed to create file2: %v", err)
 	}
 
-	size, err := GetSize(tmpDir)
+	size, err := GetSize(tmpDir, false)
 	if err != nil {
 		t.Fatalf("GetSize() error = %v", err)
 	}
@@ -74,7 +74,7 @@ func TestGetSize_DirectoryWithSubdir(t *testing.T) {
 		t.Fatalf("Failed to create file2: %v", err)
 	}
 
-	size, err := GetSize(tmpDir)
+	size, err := GetSize(tmpDir, false)
 	if err != nil {
 		t.Fatalf("GetSize() error = %v", err)
 	}
@@ -86,9 +86,44 @@ func TestGetSize_DirectoryWithSubdir(t *testing.T) {
 }
 
 func TestGetSize_NotFound(t *testing.T) {
-	_, err := GetSize("/nonexistent/path")
+	_, err := GetSize("/nonexistent/path", false)
 	if err == nil {
 		t.Error("GetSize() expected error for nonexistent path, got nil")
+	}
+}
+
+func TestGetSize_WithHiddenFiles(t *testing.T) {
+	tmpDir := t.TempDir()
+
+	visibleFile := filepath.Join(tmpDir, "visible.txt")
+	hiddenFile := filepath.Join(tmpDir, ".hidden")
+
+	err := os.WriteFile(visibleFile, []byte("visible"), 0644)
+	if err != nil {
+		t.Fatalf("Failed to create visible file: %v", err)
+	}
+
+	err = os.WriteFile(hiddenFile, []byte("hidden"), 0644)
+	if err != nil {
+		t.Fatalf("Failed to create hidden file: %v", err)
+	}
+
+	sizeWithoutHidden, err := GetSize(tmpDir, false)
+	if err != nil {
+		t.Fatalf("GetSize() error = %v", err)
+	}
+
+	sizeWithHidden, err := GetSize(tmpDir, true)
+	if err != nil {
+		t.Fatalf("GetSize() error = %v", err)
+	}
+
+	if sizeWithoutHidden != 7 {
+		t.Errorf("GetSize() without --all = %d, want 7", sizeWithoutHidden)
+	}
+
+	if sizeWithHidden != 13 {
+		t.Errorf("GetSize() with --all = %d, want 13", sizeWithHidden)
 	}
 }
 

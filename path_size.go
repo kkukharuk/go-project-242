@@ -5,7 +5,7 @@ import (
 	"os"
 )
 
-func GetSize(path string) (int64, error) {
+func GetSize(path string, includeHidden bool) (int64, error) {
 	info, err := os.Stat(path)
 	if err != nil {
 		return 0, err
@@ -22,6 +22,9 @@ func GetSize(path string) (int64, error) {
 
 	var total int64
 	for _, entry := range entries {
+		if !includeHidden && isHidden(entry.Name()) {
+			continue
+		}
 		info, err := entry.Info()
 		if err != nil {
 			return 0, err
@@ -32,6 +35,10 @@ func GetSize(path string) (int64, error) {
 	}
 
 	return total, nil
+}
+
+func isHidden(name string) bool {
+	return len(name) > 0 && name[0] == '.'
 }
 
 func FormatSize(size int64) string {

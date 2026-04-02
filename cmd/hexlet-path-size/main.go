@@ -15,12 +15,20 @@ func main() {
 		Name:      "hexlet-path-size",
 		Usage:     "print size of a file or directory",
 		ArgsUsage: "<path>",
+		Flags: []cli.Flag{
+			&cli.BoolFlag{
+				Name:    "all",
+				Aliases: []string{"a"},
+				Usage:   "include hidden files and directories",
+			},
+		},
 		Action: func(ctx context.Context, c *cli.Command) error {
 			p := c.Args().First()
 			if p == "" {
 				return fmt.Errorf("path is required")
 			}
-			size, err := pathsize.GetSize(p)
+			includeHidden := c.Bool("all")
+			size, err := pathsize.GetSize(p, includeHidden)
 			if err != nil {
 				return err
 			}
