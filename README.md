@@ -1,2 +1,21 @@
-### Hexlet tests and linter status:
-[![Actions Status](https://github.com/kkukharuk/go-project-242/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/kkukharuk/go-project-242/actions)
+# hexlet-path-size
+
+Утилита для вычисления размера путей.
+
+## Установка
+
+```bash
+make build
+```
+
+## Использование
+
+```bash
+make run
+```
+
+## Тесты
+
+```bash
+make test
+```
